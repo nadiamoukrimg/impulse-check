@@ -129,18 +129,18 @@ export default function DetalleImpulso() {
 
     <section className="tarjeta tarjeta-melocoton"><div className="rotulo"><span>PAST SELF INTENT</span><span aria-hidden="true">99</span></div><h2>YOU ORIGINALLY SAID</h2><blockquote>{impulso.motivo}</blockquote></section>
 
-    {listo && <section className="tarjeta panel-decision" aria-labelledby="titulo-decision">
-      <div className="rotulo"><span>THE MOMENT OF TRUTH</span><span className="etiqueta">TIME EXPIRED</span></div>
+    {pendiente && <section className="tarjeta panel-decision" aria-labelledby="titulo-decision">
+      <div className="rotulo"><span>THE MOMENT OF TRUTH</span><span className="etiqueta">{listo ? 'TIME EXPIRED' : 'STILL COOLING'}</span></div>
       <h2 id="titulo-decision">DO YOU STILL WANT IT?</h2>
-      <p className="nota">Put what you said then next to how you feel now. No guilt either way: buying intentionally is just as valid as skipping.</p>
+      <p className="nota">{listo ? 'Put what you said then next to how you feel now. No guilt either way: buying intentionally is just as valid as skipping.' : 'You can let this impulse go now. It will stay in your history. Buying remains locked until your waiting period ends.'}</p>
       <div className="opciones-decision">
-        <button className="boton decision-positiva" type="button" onClick={() => resolverDecision('comprado')} disabled={decidiendo}>
+        {listo && <button className="boton decision-positiva" type="button" onClick={() => resolverDecision('comprado')} disabled={decidiendo}>
           <span className="icono-decision"><Icono nombre="compra" /></span>
           <span className="texto-decision">
             <strong>YES, I STILL WANT IT →</strong>
             <small>I've waited {diasEspera} {diasEspera === 1 ? 'day' : 'days'} and this still feels like a deliberate, conscious choice.</small>
           </span>
-        </button>
+        </button>}
         <button className="boton decision-negativa" type="button" onClick={() => resolverDecision('descartado')} disabled={decidiendo}>
           <span className="icono-decision"><Icono nombre="ahorro" /></span>
           <span className="texto-decision">

@@ -269,7 +269,7 @@ Reglas aplicadas por el backend, también en este modo:
 - El filtro de actualización exige `estado: pendiente`, de modo que un impulso resuelto no recibe una segunda decisión (`409`).
 - `listo` / `ready` **nunca** se almacena: se deriva comparando `fechaFinEspera` con la hora actual, igual que en la interfaz.
 
-La interfaz solo ofrece las dos decisiones cuando el plazo ya terminó; el descarte anticipado como botón propio queda pendiente de su tarea.
+La interfaz ofrece el descarte en cualquier impulso pendiente y añade la compra solo cuando el plazo ha terminado. Ambos usan el PUT existente; descartar conserva el documento en el historial.
 
 ## Historial con impulsos resueltos
 

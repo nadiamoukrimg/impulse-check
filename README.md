@@ -86,7 +86,7 @@ La conexión y el ping a `impulse_check` funcionaron. Ambos scripts arrancaron c
 
 ## Uso de IA e incidencias
 
-Codex generó la estructura inicial, la conexión, el modelo y esta documentación. La usuaria confirmó mantener el modelo español del plan. Los prompts, incidencias de certificados y caché npm y la corrección de la prueba obsoleta `validateSync()` se registran en SKILLS.md. La revisión manual de la alumna y la reflexión final siguen pendientes.
+Codex generó la estructura inicial, la conexión, el modelo y esta documentación. La usuaria confirmó mantener el modelo español del plan. Los prompts, incidencias de certificados y caché npm y la corrección de la prueba obsoleta `validateSync()` se registran en SKILLS.md. La revisión personal de la alumna sigue pendiente. La reflexión técnica sobre el uso de IA se recoge al final de este documento, sin atribuirle experiencias personales.
 
 ## Servicio de comunicación
 
@@ -160,7 +160,7 @@ El despliegue previsto usa **dos proyectos de Vercel apuntando al mismo reposito
 
 | Proyecto | Root Directory | Framework | Qué sirve |
 | --- | --- | --- | --- |
-| `impulse-check` | `frontend` | Vite (detectado automáticamente) | SPA compilada con `npm run build` hacia `dist/` |
+| `impulse-check` | `frontend` | Vite (detectado automáticamente) | SPA compilada con `npm run construir` hacia `dist/` |
 | `impulse-check-api` | `backend` | Other (sin build) | Funciones serverless de la carpeta `api/` |
 
 ### Cómo se publica la API sin cambiar la arquitectura
@@ -196,3 +196,16 @@ Paso previo en Atlas: *Network Access* debe permitir las direcciones de Vercel (
 5. `git ls-files` solo muestra `.env.example`, nunca `.env`.
 
 Estado: la configuración está preparada y comprobada en local (prueba de integración del CRUD, prueba de las cabeceras CORS con y sin `ORIGEN_PERMITIDO`, build de producción y peticiones a través de la entrada de Vercel). **El despliegue real todavía no se ha realizado ni verificado**; los pasos anteriores quedan pendientes de ejecutarlos al publicar.
+
+
+## Reflexión técnica sobre el uso de IA
+
+La IA ayudó a dividir el desarrollo en pasos verificables: conexión a MongoDB, CRUD, servicio HTTP y pantallas React. Centralizar fetch en servicios permite cambiar la configuración del backend sin modificar cada componente. useState conserva los datos y el estado del formulario; useEffect carga los documentos cuando se abre una pantalla. Las reglas de compra y el cálculo del plazo pertenecen al servidor, porque el cliente puede manipularse.
+
+La revisión del código generado resultó necesaria. Se detectaron instrucciones de compilación que usaban un script inexistente y una interfaz que ocultaba el descarte antes del plazo, aunque la API lo permitía. Se corrigieron el comando de Vercel y la condición de visualización del panel. Las pruebas contra Atlas permiten contrastar las afirmaciones de la IA con persistencia real; una compilación correcta, por sí sola, no demuestra que el despliegue funcione.
+
+La alumna corrigió manualmente la URI de MongoDB ante la discrepancia entre los nombres de base de datos documentada en SKILLS.md. No se atribuyen a la alumna las pruebas ejecutadas por el asistente ni aprendizajes personales no comunicados. Esta reflexión describe el proceso técnico observable; la valoración personal de la alumna debe revisarse antes de entregar.
+
+## Corrección de la auditoría
+
+El detalle permite descartar cualquier impulso pendiente, incluso durante la espera, mediante el PUT existente. La compra solo se ofrece al vencer; descartar conserva el documento en el historial. Vercel tiene el comando `npm run construir` y el directorio `dist` fijados en `frontend/vercel.json`. El formulario compartido se mantiene como mejora opcional fuera de esta corrección.

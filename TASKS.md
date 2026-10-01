@@ -60,22 +60,23 @@ Leyenda: `[ ]` pendiente, `[~]` en curso, `[x]` terminada.
 - [x] Crear `SKILLS.md` en español.
 - [x] Crear la documentación inicial exigida: `PLAN.md`, `AGENTS.md`, `SKILLS.md` y `TASKS.md`.
 - [x] Crear el `README.md` en español con el estado actual del backend; se ampliará durante las siguientes fases.
-- [ ] Documentar herramientas, prompts y partes generadas por IA.
-- [ ] Documentar correcciones manuales y errores reales de la IA.
-- [ ] Escribir la reflexión final.
+- [x] Documentar herramientas, prompts y partes generadas por IA en SKILLS.md y README.md.
+- [x] Documentar correcciones manuales y errores reales de la IA, distinguiendo quién las realizó.
+- [x] Escribir la reflexión técnica basada en hechos en README.md.
+- [ ] Revisión y valoración personal de la reflexión por la alumna.
 - [ ] Revisar toda la documentación frente a la implementación final.
 
 ## Entrega
 
-- [ ] Crear commits significativos.
-- [ ] Subir el repositorio a GitHub.
+- [x] Crear commits: historial local verificado; no se han creado commits en esta corrección.
+- [x] Subir el repositorio a GitHub: consta en las verificaciones previas; las correcciones nuevas aún necesitan publicarse.
 - [ ] Desplegar API y frontend en Vercel.
 - [ ] Verificar las URLs públicas.
 - [ ] Entregar repositorio y URLs en Google Classroom.
 
 - [x] Ajuste visual solicitado: cabecera lavanda en Add Impulse, con borde, sombra, separador y puntos decorativos; comprobada en navegador móvil.
 
-- [x] Crear servicio HTTP reutilizable con cinco funciones, variable de entorno y proxy de desarrollo. Comprobados métodos y errores con respuestas controladas, y lecturas reales mediante el proxy. Integración de componentes pendiente.
+- [x] Crear servicio HTTP reutilizable con cinco funciones, variable de entorno y proxy de desarrollo. Comprobados métodos y errores con respuestas controladas, y lecturas reales mediante el proxy. Integración de componentes completada en las fases siguientes.
 
 - [x] Add Impulse: tres secciones según referencia, prioridad y recordatorio opcional; validación, POST real, confirmación y listado mínimo en Home comprobados.
 
@@ -94,3 +95,15 @@ Leyenda: `[ ]` pendiente, `[~]` en curso, `[x]` terminada.
 - [x] Preparación del despliegue en Vercel sin alterar el funcionamiento local. La app Express se expone con tres adaptadores de la carpeta `api/` (`health.js`, `impulsos.js` e `impulsos/[id].js`) que delegan en `configuracion/entradaVercel.js`, el cual memoriza la conexión con Atlas por instancia caliente y llama a `aplicacion.js`, porque Vercel no ejecuta `servidor.js`; no se usan `rewrites` para enrutar la API, ya que Vercel sustituye `req.url` y Express necesita la URL original. Nuevo middleware `middleware/corsPermitido.js`, sin dependencias, que añade las cabeceras CORS y responde `204` a `OPTIONS` solo si `ORIGEN_PERMITIDO` coincide con el origen de la petición; `aplicacion.js` lo monta con una línea y, sin la variable, no modifica ninguna respuesta. `.env.example` documenta `ORIGEN_PERMITIDO`. Verificado en local: la prueba de integración del CRUD sigue pasando, las cabeceras CORS se emiten con la variable y no se emiten sin ella, los tres archivos exportan una función, la entrada devuelve `200` en `/api/health`, `200` con los documentos reales en `/api/impulsos` y `400` con JSON en un identificador inválido, y `npm.cmd run construir` termina con exit 0. Variables manuales en Vercel y checklist de comprobación documentadas en `README.md`; **el despliegue real sigue pendiente de ejecutarse y verificarse**.
 
 - [x] Corrección de los problemas críticos de la auditoría y repetición completa de la auditoría. **Crítico 1, repositorio vacío**: ya estaba resuelto por la alumna y se comprobó de nuevo (`origin` apunta a `github.com/nadiamoukrimg/impulse-check`, tres commits, todos los archivos trackeados y ningún `.env`; solo se ignoran `backend/.env` y `frontend/.env`). **Crítico 2, despliegue de la API en Vercel**: se completó la preparación añadiendo que `frontend/vercel.json` excluye `/api/` del fallback SPA, de modo que en producción una llamada a `/api/*` mal configurada devuelve el 404 de Vercel en lugar de `index.html`. Sigue sin ejecutarse ni verificarse el despliegue real: no hay CLI ni credenciales de Vercel en este entorno y los pasos manuales están en `README.md`. **Auditoría repetida, sin fallos**: 24 comprobaciones HTTP contra la API en marcha (salud; CREATE 201 con `Location`, `estado: pendiente`, `fechaDecision: null` y plazo futuro; cinco validaciones de creación con 400; id mal formado con 400; id desconocido con 404 en GET, PUT y DELETE; compra anticipada con 409; descarte anticipado con 200 y `fechaDecision` del servidor; segunda decisión con 409; edición sobre resuelto con 409; edición válida con 200 y `fechaFinEspera` intacta; estado de decisión inválido y mezcla de decisión y edición con 400; cuerpo de 150 KB con 413; rutas desconocidas con 404 en JSON; DELETE con 200 y 404 posterior; y colección restaurada al estado inicial con el documento existente). Prueba de integración `pass 1/1`, fallback 500 en JSON, CORS con cabeceras cuando existe `ORIGEN_PERMITIDO` y sin cabeceras cuando no existe, y los tres archivos de `api/` respondiendo con la URL original a través de la entrada de Vercel. `npm.cmd run construir` con exit 0 y `vercel.json` con JSON válido. En navegador: Home carga por proxy con el documento existente, el formulario crea con 201 y muestra la confirmación, el detalle y la edición hacen PUT 200 sin tocar el plazo, el descarte pasa a `Skipped`, el Historial muestra `1 decision` con fecha y hora, el borrado pide confirmación y devuelve 200 con el registro fuera de Atlas, `/ruta-inexistente` y un id desconocido muestran sus pantallas, y los estados vacío (Home e Historial), de error con `Try again` y de recuperación se probaron en una instancia aislada con API simulada, dejando los servidores de la usuaria intactos. La consola no muestra errores de aplicación (solo los registros de red 404/502 provocados por las propias pruebas) y los registros temporales se borraron al terminar. **Hallazgo nuevo clasificado como importante, no crítico**: la interfaz todavía no ofrece el descarte anticipado como botón propio, pendiente documentado en `PLAN.md`; el resto de pendientes conocidos (formulario compartido, pruebas de diseño móvil, despliegue real) no cambian. Sin dependencias nuevas.
+
+
+## Estado posterior a la corrección de auditoría rápida
+
+- [x] Ofrecer descarte anticipado desde el detalle, manteniendo la compra condicionada al plazo.
+- [x] Fijar `npm run construir` y `dist` en la configuración de Vercel y corregir el README.
+- [x] Ampliar y ejecutar la prueba contra Atlas: compra anticipada 409, descarte 200 persistido, plazo intacto y segunda decisión 409. Build correcto.
+- [x] Incorporar reflexión técnica sobre IA y actualizar tareas de documentación y Git ya realizadas.
+- [ ] Revisar personalmente la reflexión antes de entregar.
+- [ ] Publicar las correcciones y verificar las URLs de Vercel: el panel requiere iniciar sesión.
+- [ ] Verificar visualmente el nuevo botón de descarte anticipado.
+- Formulario compartido: mejora opcional excluida expresamente por la alumna. Las entradas anteriores son el historial de verificaciones, no una afirmación de despliegue actual.

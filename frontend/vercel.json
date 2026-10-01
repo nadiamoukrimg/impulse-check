@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run construir",
+  "outputDirectory": "dist",
   "rewrites": [
     { "source": "/((?!assets/|api/).*)", "destination": "/index.html" }
   ]

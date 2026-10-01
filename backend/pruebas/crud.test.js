@@ -62,7 +62,13 @@ test('CRUD y errores contra Atlas; elimina únicamente sus propios registros', a
     await solicitar('PUT', `${ruta}/${idCreado}`, { precio: 5 }, 400);
     await solicitar('PUT', `${ruta}/${idCreado}`, { ...edicion, estado: 'comprado' }, 400);
     // Preparar exclusivamente el registro de esta prueba para comprobar el bloqueo.
-    await Impulso.updateOne({ _id: idCreado }, { $set: { estado: 'descartado', fechaDecision: new Date() } });
+    await solicitar('PUT', `${ruta}/${idCreado}`, { estado: 'comprado' }, 409);
+    const descartado = await solicitar('PUT', `${ruta}/${idCreado}`, { estado: 'descartado' }, 200);
+    assert.equal(descartado.estado, 'descartado');
+    assert.ok(descartado.fechaDecision);
+    assert.equal(descartado.fechaFinEspera, creado.fechaFinEspera);
+    assert.equal((await Impulso.findById(idCreado)).estado, 'descartado');
+    await solicitar('PUT', `${ruta}/${idCreado}`, { estado: 'descartado' }, 409);
     await solicitar('PUT', `${ruta}/${idCreado}`, edicion, 409);
     assert.equal((await Impulso.findById(idCreado)).nombre, edicion.nombre);
     for (const metodo of ['GET', 'PUT', 'DELETE']) {

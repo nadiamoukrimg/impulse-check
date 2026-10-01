@@ -221,3 +221,11 @@ La alumna solicitó My Impulses con datos reales y cuatro estados. Se conservaro
 - Sin dependencias nuevas ni cambios de modelo ni de API.
 - Registros: los documentos temporales creados por el guion y por el recorrido del navegador se borraron; solo queda el documento existente de la alumna.
 - Revisión manual de la alumna: pendiente.
+
+
+## Corrección tras auditoría rápida
+
+- Petición: arreglar los problemas detectados salvo la mejora opcional del formulario compartido.
+- Cambios generados: descarte visible durante la espera usando el mismo servicio PUT, compra visible solo al vencer, comando de compilación explícito en Vercel y corrección del README y seguimiento. Reflexión técnica basada en hechos, sin atribuir experiencias personales a la alumna.
+- Verificación: build correcto con los dos avisos conocidos de React Router; prueba de integración contra Atlas correcta, ampliada para verificar compra anticipada rechazada, descarte anticipado persistido con plazo intacto y segunda decisión rechazada. Registro temporal eliminado por la prueba.
+- Límite: el panel de Vercel redirige al inicio de sesión; publicación y URLs públicas pendientes. No se ha repetido una prueba visual del nuevo botón en esta corrección.
