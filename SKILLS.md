@@ -229,3 +229,8 @@ La alumna solicitó My Impulses con datos reales y cuatro estados. Se conservaro
 - Cambios generados: descarte visible durante la espera usando el mismo servicio PUT, compra visible solo al vencer, comando de compilación explícito en Vercel y corrección del README y seguimiento. Reflexión técnica basada en hechos, sin atribuir experiencias personales a la alumna.
 - Verificación: build correcto con los dos avisos conocidos de React Router; prueba de integración contra Atlas correcta, ampliada para verificar compra anticipada rechazada, descarte anticipado persistido con plazo intacto y segunda decisión rechazada. Registro temporal eliminado por la prueba.
 - Límite: el panel de Vercel redirige al inicio de sesión; publicación y URLs públicas pendientes. No se ha repetido una prueba visual del nuevo botón en esta corrección.
+
+
+### Cierre del despliegue y verificación pública
+
+La alumna proporcionó acceso temporal autorizado a Vercel. Se localizaron los dos proyectos existentes y se comprobó la API publicada y CORS. Se publicó el frontend corregido desde los archivos locales sin incluir .env y el despliegue alcanzó READY. URLs: https://impulse-check-frontend.vercel.app y https://impulse-check-api.vercel.app/api/health. CRUD público correcto con registro propio temporal eliminado: POST, listado, detalle, PUT persistido, compra anticipada 409, descarte 200 y DELETE con 404 posterior. En navegador, Home carga datos y el detalle abierto directamente muestra descarte durante la espera sin ofrecer compra. Esta verificación sustituye el bloqueo de inicio de sesión anterior. No se hizo commit ni push de las correcciones; no se guardó el token en el repositorio.

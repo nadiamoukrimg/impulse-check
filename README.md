@@ -4,7 +4,7 @@ Aplicación mobile-first para pausar compras impulsivas. El alcance se describe 
 
 ## Estado actual
 
-Backend Express con `/api/health`, conexión a MongoDB Atlas, modelo Mongoose `Impulso` y cinco operaciones CRUD implementadas y verificadas contra Atlas. Frontend React con listado real en Home y su resumen económico, detalle con lectura, edición, eliminación y decisión (comprar o descartar), y Historial con las decisiones resueltas, todos conectados a la API. Siguen pendientes el formulario compartido de creación y edición, las pruebas de diseño móvil y despliegue, y la entrega en Vercel.
+Backend Express con `/api/health`, conexión a MongoDB Atlas, modelo Mongoose `Impulso` y cinco operaciones CRUD implementadas y verificadas contra Atlas. Frontend React con listado real en Home y su resumen económico, detalle con lectura, edición, eliminación y decisión (comprar o descartar), y Historial con las decisiones resueltas, todos conectados a la API. Frontend y API publicados y comprobados en Vercel. El formulario compartido queda como mejora opcional; la valoración personal y la entrega académica corresponden a la alumna.
 
 ## Frontend: estructura y navegación
 
@@ -31,7 +31,7 @@ Comprobado en la primera fase: los tres scripts, navegación y recarga de creaci
 
 Vite terminó la compilación con dos avisos de React Router sobre la directiva `use client`; no bloquearon la compilación ni el recorrido del navegador. No se ocultan los avisos.
 
-Para el futuro despliegue del frontend en Vercel, seleccionar `frontend` como directorio raíz. `vercel.json` prepara la resolución de rutas a `index.html` y excluye `/api/`, de modo que una llamada a la API mal configurada falle con el 404 de Vercel en lugar de devolver la página. Esta configuración todavía no se ha probado en un despliegue público; los detalles están en [Despliegue en Vercel](#despliegue-en-vercel).
+Para el futuro despliegue del frontend en Vercel, seleccionar `frontend` como directorio raíz. `vercel.json` prepara la resolución de rutas a `index.html` y excluye `/api/`, de modo que una llamada a la API mal configurada falle con el 404 de Vercel en lugar de devolver la página. Esta configuración se ha probado entrando directamente al detalle en el despliegue público; los detalles están en [Despliegue en Vercel](#despliegue-en-vercel).
 
 ## Arranque local
 
@@ -195,7 +195,7 @@ Paso previo en Atlas: *Network Access* debe permitir las direcciones de Vercel (
 4. Crear, editar y eliminar un impulso desde la interfaz y comprobar en Atlas que el documento cambia.
 5. `git ls-files` solo muestra `.env.example`, nunca `.env`.
 
-Estado: la configuración está preparada y comprobada en local (prueba de integración del CRUD, prueba de las cabeceras CORS con y sin `ORIGEN_PERMITIDO`, build de producción y peticiones a través de la entrada de Vercel). **El despliegue real todavía no se ha realizado ni verificado**; los pasos anteriores quedan pendientes de ejecutarlos al publicar.
+Estado: despliegue real comprobado. Frontend: https://impulse-check-frontend.vercel.app. API: https://impulse-check-api.vercel.app/api/health. La API existente respondió 200 y CORS permitió el origen del frontend. Se publicó el frontend corregido desde los archivos locales, sin incluir .env. El CRUD público verificó creación, lectura, edición persistida, plazo intacto, compra anticipada rechazada, descarte anticipado y eliminación con 404 posterior. El registro temporal se eliminó. En navegador se verificaron Home con datos reales y entrada directa al detalle con descarte visible durante la espera y compra ausente. No se modificó el documento de la usuaria. Las correcciones locales aún deben incorporarse al repositorio remoto antes de futuros despliegues desde Git.
 
 
 ## Reflexión técnica sobre el uso de IA

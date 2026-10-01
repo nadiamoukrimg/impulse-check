@@ -70,8 +70,8 @@ Leyenda: `[ ]` pendiente, `[~]` en curso, `[x]` terminada.
 
 - [x] Crear commits: historial local verificado; no se han creado commits en esta corrección.
 - [x] Subir el repositorio a GitHub: consta en las verificaciones previas; las correcciones nuevas aún necesitan publicarse.
-- [ ] Desplegar API y frontend en Vercel.
-- [ ] Verificar las URLs públicas.
+- [x] Desplegar API y frontend en Vercel.
+- [x] Verificar las URLs públicas.
 - [ ] Entregar repositorio y URLs en Google Classroom.
 
 - [x] Ajuste visual solicitado: cabecera lavanda en Add Impulse, con borde, sombra, separador y puntos decorativos; comprobada en navegador móvil.
@@ -104,6 +104,12 @@ Leyenda: `[ ]` pendiente, `[~]` en curso, `[x]` terminada.
 - [x] Ampliar y ejecutar la prueba contra Atlas: compra anticipada 409, descarte 200 persistido, plazo intacto y segunda decisión 409. Build correcto.
 - [x] Incorporar reflexión técnica sobre IA y actualizar tareas de documentación y Git ya realizadas.
 - [ ] Revisar personalmente la reflexión antes de entregar.
-- [ ] Publicar las correcciones y verificar las URLs de Vercel: el panel requiere iniciar sesión.
-- [ ] Verificar visualmente el nuevo botón de descarte anticipado.
+- [x] Publicar las correcciones y verificar las URLs de Vercel mediante acceso autorizado.
+- [ ] Incorporar las correcciones locales al repositorio remoto antes del próximo despliegue desde Git.
+- [x] Verificar en navegador público el nuevo botón de descarte anticipado.
 - Formulario compartido: mejora opcional excluida expresamente por la alumna. Las entradas anteriores son el historial de verificaciones, no una afirmación de despliegue actual.
+
+
+### Cierre del despliegue y verificación pública
+
+La alumna proporcionó acceso temporal autorizado a Vercel. Se localizaron los dos proyectos existentes y se comprobó la API publicada y CORS. Se publicó el frontend corregido desde los archivos locales sin incluir .env y el despliegue alcanzó READY. URLs: https://impulse-check-frontend.vercel.app y https://impulse-check-api.vercel.app/api/health. CRUD público correcto con registro propio temporal eliminado: POST, listado, detalle, PUT persistido, compra anticipada 409, descarte 200 y DELETE con 404 posterior. En navegador, Home carga datos y el detalle abierto directamente muestra descarte durante la espera sin ofrecer compra. Esta verificación sustituye el bloqueo de inicio de sesión anterior. No se hizo commit ni push de las correcciones; no se guardó el token en el repositorio.
