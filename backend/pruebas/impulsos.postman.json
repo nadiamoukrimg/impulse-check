@@ -2,7 +2,7 @@
   "info": {
     "name": "Impulsos - CRUD manual",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Peticiones independientes: seleccionar y enviar solo la deseada. Configurar base y copiar manualmente el _id creado en id. GET por ID, PUT y DELETE requieren un registro existente; la última consulta requiere que se haya eliminado. Los bloques de decisión resuelven el registro de forma permanente, así que se envían después de las comprobaciones de edición. Comprar tras terminar la espera (esperado 200) necesita un registro con fechaFinEspera ya vencida. Para repetir la demostración, crear otro registro y actualizar id. No contiene credenciales. No ejecutar DELETE sobre datos ajenos."
+    "description": "Peticiones independientes: seleccionar y enviar solo la deseada. El primer bloque comprueba la salud de la API sin tocar datos. Configurar base y copiar manualmente el _id creado en id. GET por ID, PUT y DELETE requieren un registro existente; la última consulta requiere que se haya eliminado. Los bloques de decisión resuelven el registro de forma permanente, así que se envían después de las comprobaciones de edición. Comprar tras terminar la espera (esperado 200) necesita un registro con fechaFinEspera ya vencida. Para repetir la demostración, crear otro registro y actualizar id. No contiene credenciales. No ejecutar DELETE sobre datos ajenos."
   },
   "variable": [
     {
@@ -17,6 +17,16 @@
     }
   ],
   "item": [
+    {
+      "name": "Comprobar la salud de la API",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/api/health",
+        "description": "Esperado: HTTP 200. No crea, lee ni modifica documentos; devuelve { \"estado\": \"ok\", \"mensaje\": \"...\" }."
+      },
+      "response": []
+    },
     {
       "name": "Listar impulsos",
       "request": {

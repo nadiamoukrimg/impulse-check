@@ -4,7 +4,7 @@ Aplicación mobile-first para pausar compras impulsivas. El alcance se describe 
 
 ## Estado actual
 
-Backend Express con `/api/health`, conexión a MongoDB Atlas, modelo Mongoose `Impulso` y cinco operaciones CRUD implementadas y verificadas contra Atlas. Frontend React con páginas base, listado real en Home con el resumen económico de la referencia, detalle con lectura, edición y eliminación, y el flujo de decisión (comprar o descartar) conectados a la API. Historial y el despliegue siguen pendientes.
+Backend Express con `/api/health`, conexión a MongoDB Atlas, modelo Mongoose `Impulso` y cinco operaciones CRUD implementadas y verificadas contra Atlas. Frontend React con listado real en Home y su resumen económico, detalle con lectura, edición, eliminación y decisión (comprar o descartar), y Historial con las decisiones resueltas, todos conectados a la API. Siguen pendientes el formulario compartido de creación y edición, las pruebas de diseño móvil y despliegue, y la entrega en Vercel.
 
 ## Frontend: estructura y navegación
 
@@ -15,19 +15,19 @@ Dependencias previstas en el plan: React define los componentes; React DOM los m
 | Carpeta o archivo | Responsabilidad |
 | --- | --- |
 | `frontend/src/componentes/` | Estructura compartida, navegación, iconos y estados visuales reutilizables |
-| `frontend/src/paginas/` | Inicio, creación, detalle, historial y página no encontrada |
-| `frontend/src/servicios/` | Reservada para las futuras peticiones HTTP; sin conexión implementada |
+| `frontend/src/paginas/` | Inicio, creación, detalle, edición, historial y página no encontrada |
+| `frontend/src/servicios/` | `api.js` con las cinco peticiones HTTP a la API, su manejo de errores y la documentación del servicio |
 | `frontend/src/estilos/` | CSS mobile-first compartido |
 | `frontend/src/Aplicacion.jsx` | Relaciona URLs y páginas |
 | `frontend/src/principal.jsx` | Monta React y BrowserRouter |
 
-Home e Impulses permanecen unificados en `/`. Las demás rutas son `/impulsos/nuevo`, `/impulsos/:id` y `/historial`. Home incluye un enlace a `/impulsos/ejemplo` para revisar el detalle sin datos. La barra inferior enlaza Home e History; la cabecera permite acceder a Add Impulse. Las rutas desconocidas muestran una página con enlace de vuelta.
+Home e Impulses permanecen unificados en `/`. Las demás rutas son `/impulsos/nuevo`, `/impulsos/:id`, `/impulsos/:id/editar` y `/historial`. La barra inferior enlaza Home e History; la cabecera permite acceder a Add Impulse. Cada tarjeta abre su detalle y las rutas desconocidas muestran una página con enlace de vuelta.
 
-`Link` y `NavLink` cambian la página sin recargar el documento; `NavLink` destaca la sección activa. `Outlet` muestra cada página dentro de la misma cabecera y navegación. Un `useEffect` actualiza el título y devuelve el foco al contenido al cambiar de ruta. No se necesita todavía estado de datos con `useState`.
+`Link` y `NavLink` cambian la página sin recargar el documento; `NavLink` destaca la sección activa. `Outlet` muestra cada página dentro de la misma cabecera y navegación. Un `useEffect` actualiza el título y devuelve el foco al contenido al cambiar de ruta. Cada página carga y guarda sus datos con `useState` y `useEffect`.
 
-Esta fase es una previsualización: los importes muestran guiones, el formulario está desactivado y no se consulta ni modifica MongoDB. La referencia local de Stitch se utilizó para colores, tipografía y estilo, sin copiar su código ni incorporar Settings. Las fuentes de Google Fonts tienen alternativa sans-serif si no se descargan.
+La referencia local de Stitch se utilizó para colores, tipografía y estilo, sin copiar su código ni incorporar Settings. Las fuentes de Google Fonts tienen alternativa sans-serif si no se descargan.
 
-Comprobado: los tres scripts, navegación y recarga de creación, historial y detalle, manejo de rutas desconocidas y ausencia de errores en la consola durante el recorrido. Home y detalle no desbordan horizontalmente a 320 px; también se revisó a 390 px y en escritorio. La versión compilada permite entrar y recargar `/impulsos/nuevo`.
+Comprobado en la primera fase: los tres scripts, navegación y recarga de creación, historial y detalle, manejo de rutas desconocidas y ausencia de errores en la consola durante el recorrido. Home y detalle no desbordan horizontalmente a 320 px; también se revisó a 390 px y en escritorio. La versión compilada permite entrar y recargar `/impulsos/nuevo`.
 
 Vite terminó la compilación con dos avisos de React Router sobre la directiva `use client`; no bloquearon la compilación ni el recorrido del navegador. No se ocultan los avisos.
 

@@ -10,11 +10,11 @@ No se documentarán errores, aprendizajes, pruebas o correcciones que todavía n
 
 - **Codex:** utilizado para analizar el enunciado y la referencia visual, delimitar el MVP y crear la documentación inicial del repositorio.
 
-Se han generado y comprobado la estructura inicial del backend, la conexión a Atlas y el modelo `Impulso`. Las cinco operaciones CRUD están implementadas y verificadas contra Atlas. El frontend tiene estructura y navegación verificadas; la integración sigue pendiente.
+Se han generado y comprobado la estructura inicial del backend, la conexión a Atlas y el modelo `Impulso`. Las cinco operaciones CRUD están implementadas y verificadas contra Atlas. El frontend está integrado con la API: listado, creación, detalle, edición, decisión, eliminación e historial de decisiones, todos conectados y comprobados contra la base real.
 
 ## Técnicas utilizadas
 
-### Base del frontend — 1 de octubre de 2026
+### Base del frontend 
 
 - Prompt: implementar únicamente estructura React y navegación mobile-first a partir de la referencia de Stitch, sin conectar la API.
 - Decisión confirmada: conservar Home e Impulses unificados y nombres de carpetas en español, con textos visibles en inglés.
@@ -102,7 +102,7 @@ arranque y la respuesta HTTP antes de dar el trabajo por terminado.
 
 ## Plantilla para futuras entradas
 
-### Conexión y modelo — 1 de octubre de 2026
+### Conexión y modelo 
 
 - Herramienta: Codex.
 - Prompt y decisión útiles: implementar solo conexión y modelo; tras detectar diferencias con el plan, la alumna confirmó mantener los campos españoles de `Impulso` sin campos adicionales.
@@ -115,7 +115,7 @@ arranque y la respuesta HTTP antes de dar el trabajo por terminado.
 
 Cada uso relevante de IA puede añadirse con esta estructura:
 
-### CRUD REST — 1 de octubre de 2026
+### CRUD REST 
 
 - Herramienta: Codex.
 - Prompt: implementar únicamente las cinco operaciones CRUD, con errores JSON, separación de rutas y controladores y pruebas reales. La usuaria confirmó rutas españolas y duración expresada en días.
@@ -156,7 +156,7 @@ La alumna autorizó añadir prioridad y restricción personal como recordatorio.
 
 La alumna solicitó My Impulses con datos reales y cuatro estados. Se conservaron Home unificado, nombres españoles y el contrato /api/impulsos. Se extrajo TarjetaImpulso, se agruparon registros y se separó el reloj local de la petición GET. Pruebas reales: cero registros, creación desde React y aparición en lista, enlace al ID correcto, múltiples estados preparados exclusivamente en registros temporales de Atlas, transición de espera a listo y error/reintento deteniendo temporalmente la API. Se borraron los cinco registros de prueba y se restauró el servidor. Build correcto con los avisos conocidos de React Router; el primer comando de build se lanzó desde la raíz sin package.json y se repitió correctamente desde frontend. El detalle continúa siendo una previsualización.
 
-### Detalle con edición y borrado — 1 de octubre de 2026
+### Detalle con edición y borrado 
 
 - Herramienta: OpenCode con navegador integrado.
 - Prompt: "Inspecciona los archivos relacionados y resume cómo funciona ahora. Si falta una decisión importante, indícala antes de asumirla. Propón un plan breve e implementa primero READ, después UPDATE y por último DELETE, comprobando cada uno."
@@ -168,7 +168,7 @@ La alumna solicitó My Impulses con datos reales y cuatro estados. Se conservaro
 - Sin dependencias nuevas y sin cambios en el modelo ni en las rutas de la API.
 - Revisión manual de la alumna: pendiente.
 
-### Decisión al terminar la espera — 1 de octubre de 2026
+### Decisión al terminar la espera 
 
 - Herramienta: OpenCode con navegador integrado.
 - Prompt: "Implementa únicamente el flujo de decisión cuando el periodo de espera haya terminado. Determina si `cooldownUntil` ya ha pasado; si no, conserva la vista de cooling; si ha pasado, muestra `Do you still want it?`. Recupera el motivo original, actualiza `purchased` y `skipped` con `resolvedAt`, usa PUT mediante `services/api.js`, no elimines el impulso, no guardes `ready`, evita afirmaciones pseudocientíficas sobre dopamina y no añadas dependencias. Forma de trabajo: inspecciona, explica el estado efectivo, señala edge cases, implementa, comprueba contra MongoDB y resume."
@@ -180,7 +180,7 @@ La alumna solicitó My Impulses con datos reales y cuatro estados. Se conservaro
 - Sin dependencias nuevas y sin cambios en el modelo ni en las rutas de la API: sigue siendo `PUT /api/impulsos/:id`.
 - Revisión manual de la alumna: pendiente.
 
-### Resumen económico del Home — 1 de octubre de 2026
+### Resumen económico del Home 
 
 - Herramienta: OpenCode con navegador integrado.
 - Prompt: "En la referencia visual, en home hay un recuento también del dinero que está en pausa actualmente y en la web final eso no aparece, solo aparece el recuadro para añadir un impulso y el recuento del dinero gastado o ahorrado; puedes cambiar eso para que se vea como la imagen que te adjunto."
@@ -193,7 +193,7 @@ La alumna solicitó My Impulses con datos reales y cuatro estados. Se conservaro
 - Registros: se eliminaron los cuatro documentos de prueba creados para esta comprobación; los documentos existentes de la usuaria se conservaron.
 - Revisión manual de la alumna: pendiente.
 
-### Historial con decisiones resueltas — 1 de octubre de 2026
+### Historial con decisiones resueltas 
 
 - Herramienta: OpenCode con navegador integrado.
 - Prompt: "Implementa únicamente History con los impulsos ya resueltos. Utiliza datos reales, muestra únicamente purchased y skipped, ordena por resolvedAt del más reciente al más antiguo, diferencia visualmente ambas decisiones, muestra nombre, precio, categoría, decisión y fecha, para skipped muestra el precio como dinero no gastado, cada elemento puede abrir su detalle, incluye estado vacío, mantén el diseño mobile-first y no añadas dependencias sin explicar por qué. Forma de trabajo: inspecciona, explica qué datos reutilizas, implementa filtrado y ordenación, comprueba con varios estados, aplica la referencia visual, resume los cambios y explica filter(), sort() y el renderizado."

@@ -1,8 +1,12 @@
-# Peticiones independientes: seleccionar y enviar solo la deseada. Configurar base y copiar manualmente el _id creado en id. GET por ID, PUT y DELETE requieren un registro existente; la última consulta requiere que se haya eliminado. Los bloques de decisión resuelven el registro de forma permanente, así que se envían después de las comprobaciones de edición. Comprar tras terminar la espera (esperado 200) necesita un registro con fechaFinEspera ya vencida. Para repetir la demostración, crear otro registro y actualizar id. No contiene credenciales. No ejecutar DELETE sobre datos ajenos.
+# Peticiones independientes: seleccionar y enviar solo la deseada. El primer bloque comprueba la salud de la API sin tocar datos. Configurar base y copiar manualmente el _id creado en id. GET por ID, PUT y DELETE requieren un registro existente; la última consulta requiere que se haya eliminado. Los bloques de decisión resuelven el registro de forma permanente, así que se envían después de las comprobaciones de edición. Comprar tras terminar la espera (esperado 200) necesita un registro con fechaFinEspera ya vencida. Para repetir la demostración, crear otro registro y actualizar id. No contiene credenciales. No ejecutar DELETE sobre datos ajenos.
 # Arrancar desde backend: npm.cmd run desarrollo
 # En un cliente compatible con .http, enviar cada bloque por separado.
 @base = http://localhost:3000
 @id = sustituir_por_el_id_creado
+
+### Comprobar la salud de la API — esperado 200
+# No crea, lee ni modifica documentos. Devuelve { "estado": "ok", "mensaje": "..." }.
+GET {{base}}/api/health
 
 ### Listar impulsos — esperado 200
 # Devuelve una lista JSON, que puede estar vacía.

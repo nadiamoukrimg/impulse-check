@@ -33,7 +33,7 @@ Ejemplos: `TarjetaImpulso`, `impulsosPendientes`, `obtenerImpulsos`, `controlado
 - El diseño de Google Stitch/Netlify se utiliza como referencia visual, sin reutilizar su código.
 - La aplicación es mobile-first.
 - `Home` e `Impulses` se fusionan porque muestran las mismas listas activas.
-- Confirmado de nuevo al iniciar el frontend: navegación inferior con Home e History, y acceso destacado a Add Impulse. La primera fase solo prepara páginas y navegación, sin API; el enlace `/impulsos/ejemplo` muestra el detalle como previsualización explícita, sin registros simulados ni persistencia. La edición se incorporará con su formulario en una fase posterior.
+- Confirmado de nuevo al iniciar el frontend: navegación inferior con Home e History, y acceso destacado a Add Impulse. La primera fase solo preparó páginas y navegación, sin API, con el enlace `/impulsos/ejemplo` como previsualización explícita del detalle, sin registros simulados ni persistencia; ese enlace se retiró cuando el detalle se conectó a la API y ahora se abre desde cada tarjeta, y la edición cuenta con su propia ruta `/impulsos/:id/editar`.
 - Se omite `Settings` porque el almacenamiento local, la exportación y las preferencias quedan fuera del MVP.
 - No hay autenticación en esta versión.
 - Es una demo compartida: todas las visitas ven los mismos registros de MongoDB.
@@ -125,6 +125,7 @@ Los estados visuales y totales se calculan a partir de `Impulso`. No existe otro
 
 ## Endpoints
 
+- `GET /api/health`: comprueba que la API está arrancada; devuelve `200` con `{ "estado": "ok" }` y no toca la base de datos.
 - `GET /api/impulsos`: devuelve todos los impulsos.
 - `GET /api/impulsos/:id`: devuelve uno o un error `404`.
 - `POST /api/impulsos`: valida, calcula `fechaFinEspera` y crea un pendiente.
@@ -144,7 +145,7 @@ No se necesitan procesos en segundo plano: se guarda una fecha límite y se comp
 
 ## Estructura del repositorio
 
-El backend CRUD y la base del frontend React ya están creados. La integración con la API y las acciones de decisión siguen pendientes.
+El backend CRUD y la aplicación React están integrados con la API: creación, listado, detalle, edición, decisión, eliminación e historial funcionan contra MongoDB Atlas. Siguen pendientes el formulario compartido y el despliegue.
 
 ```text
 PEC5/
