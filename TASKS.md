@@ -17,47 +17,49 @@ Leyenda: `[ ]` pendiente, `[~]` en curso, `[x]` terminada.
 
 ## Preparación
 
-- [ ] Crear frontend y backend con nombres en español.
-- [ ] Configurar los scripts de desarrollo.
-- [ ] Añadir `.gitignore`, `.env.example` y variables locales.
-- [ ] Conectar MongoDB Atlas.
-- [ ] Configurar la comunicación entre frontend y API.
+- [x] Crear frontend y backend con nombres en español: ambas estructuras creadas.
+- [x] Configurar los scripts iniciales del backend.
+- [x] Añadir `.gitignore`, `.env.example` y variables locales: `.env` excluido y variable MongoDB documentada sin secretos.
+- [x] Conectar MongoDB Atlas: conexión y ping a `impulse_check` comprobados.
+- [x] Configurar la comunicación entre frontend y API: servicio, proxy, creación y listado mínimo conectados.
 
 ## Backend
 
-- [ ] Crear el modelo `Impulso`.
-- [ ] Implementar listado y detalle.
-- [ ] Implementar creación y cálculo de plazo.
-- [ ] Implementar edición sin cambios de plazo.
-- [ ] Implementar descarte anticipado y validación de compra.
-- [ ] Implementar eliminación permanente.
-- [ ] Añadir validación y gestión JSON de errores.
+- [x] Configurar Express y la ruta `GET /api/health`.
+- [x] Crear el modelo `Impulso`: validaciones comprobadas en memoria sin guardar registros.
+- [x] Implementar listado y detalle.
+- [x] Implementar creación y cálculo de plazo.
+- [x] Implementar edición sin cambios de plazo.
+- [x] Implementar descarte anticipado y validación de compra: PUT con cuerpo `{ "estado": ... }`, compra rechazada antes de `fechaFinEspera` (409) y descarte aceptado en cualquier momento; segunda decisión, estados no resolubles y mezcla con edición rechazados.
+- [x] Implementar eliminación permanente.
+- [x] Añadir validación y gestión JSON de errores.
 
 ## Frontend
 
-- [ ] Implementar estructura y navegación mobile-first.
-- [ ] Implementar Inicio con resúmenes y listas activas.
+- [x] Implementar estructura y navegación mobile-first: Home e Impulses unificados; creación, detalle e historial accesibles, sin conexión a la API. Compilación, navegación y recarga local comprobadas.
+- [x] Implementar Inicio con resúmenes y listas activas: `SAVINGS_VAULT.SYS` con el dinero no gastado, `ON HOLD` con lo que está en pausa y `PURCHASED` con lo comprado, calculados desde los documentos reales; `Inicio` hace la única petición GET y se la pasa a `ListaImpulsos`. Cargando o en error los importes muestran `—` y `Try again` reutiliza el mismo reintento.
 - [ ] Implementar el formulario compartido.
-- [ ] Implementar detalle y acciones según estado.
-- [ ] Implementar confirmaciones de descarte y eliminación.
-- [ ] Implementar Historial.
-- [ ] Añadir estados de carga, vacío, éxito y error.
-- [ ] Añadir el aviso de demo compartida.
-- [ ] Comprobar que todas las cadenas visibles estén en inglés.
+- [x] Implementar detalle y acciones según estado: lectura por ID, edición, eliminación y decisión (comprar o descartar) cuando termina la espera.
+- [x] Implementar confirmaciones de descarte y eliminación: la eliminación pide confirmación en un panel; las dos decisiones se aplican directamente desde sus botones, siguiendo la referencia visual, y no se puede repetir una decisión ya guardada.
+- [x] Implementar Historial: página `/historial` con los documentos reales de `GET /api/impulsos`, filtrados con `filter()` a `comprado` y `descartado` y ordenados con `sort()` por `fechaDecision` descendente; tarjetas `TarjetaVeredicto` con nombre, prioridad, fecha y hora, precio e importe, sin dependencias nuevas ni endpoints nuevos.
+- [x] Añadir estados de carga, vacío, éxito y error: detalle con loading, error con reintento y no encontrado; aviso de guardado tras editar; listado con loading, vacío e error; historial con loading, error con `Try again` y vacío (`No decisions yet`).
+- [x] Añadir el aviso de demo compartida.
+- [x] Comprobar que todas las cadenas visibles de la estructura actual estén en inglés; repetir al añadir funcionalidad.
 
 ## Pruebas
 
-- [ ] Crear el archivo `.http` con nombre en español.
-- [ ] Crear la colección `.postman.json` con nombre en español.
-- [ ] Probar el CRUD completo contra MongoDB.
-- [ ] Probar descarte anticipado y bloqueo de compra anticipada.
+- [x] Crear el archivo `.http` con nombre en español.
+- [x] Crear la colección `.postman.json` con nombre en español.
+- [x] Probar el CRUD completo contra MongoDB: prueba de integración superada tras la corrección manual de la URI; persistencia, edición, borrado y errores verificados. Registro temporal eliminado.
+- [x] Probar descarte anticipado y bloqueo de compra anticipada: compra con 409 antes del plazo, descarte anticipado con 200 y `fechaDecision` del servidor, segunda decisión con 409, `listo`/`pendiente` con 400 y mezcla de decisión y edición con 400. En interfaz, un impulso sin vencer no muestra las decisiones y dos vencidos resolvieron a `comprado` y `descartado` con persistencia tras recargar. En MongoDB no hay documentos con `estado: listo` ni resueltos sin `fechaDecision`.
+- [x] Probar el detalle desde la interfaz contra Atlas: lectura por ID con el registro correcto, PUT con plazo intacto y persistencia tras recargar, confirmación y DELETE real, ausencia del registro en My Impulses y 404 posterior. También loading, error con Try again tras detener la API y estado no encontrado. Registro temporal eliminado y base vacía al terminar.
 - [ ] Probar diseño móvil y despliegues.
 
 ## Documentación
 
 - [x] Crear `SKILLS.md` en español.
 - [x] Crear la documentación inicial exigida: `PLAN.md`, `AGENTS.md`, `SKILLS.md` y `TASKS.md`.
-- [ ] Crear el `README.md` en español.
+- [x] Crear el `README.md` en español con el estado actual del backend; se ampliará durante las siguientes fases.
 - [ ] Documentar herramientas, prompts y partes generadas por IA.
 - [ ] Documentar correcciones manuales y errores reales de la IA.
 - [ ] Escribir la reflexión final.
@@ -70,3 +72,19 @@ Leyenda: `[ ]` pendiente, `[~]` en curso, `[x]` terminada.
 - [ ] Desplegar API y frontend en Vercel.
 - [ ] Verificar las URLs públicas.
 - [ ] Entregar repositorio y URLs en Google Classroom.
+
+- [x] Ajuste visual solicitado: cabecera lavanda en Add Impulse, con borde, sombra, separador y puntos decorativos; comprobada en navegador móvil.
+
+- [x] Crear servicio HTTP reutilizable con cinco funciones, variable de entorno y proxy de desarrollo. Comprobados métodos y errores con respuestas controladas, y lecturas reales mediante el proxy. Integración de componentes pendiente.
+
+- [x] Add Impulse: tres secciones según referencia, prioridad y recordatorio opcional; validación, POST real, confirmación y listado mínimo en Home comprobados.
+
+- [x] Listado real en Home/My Impulses: TarjetaImpulso reutilizable, cuatro estados visuales, agrupación, tiempo restante, loading/error/vacío y reintento. Verificados cero, uno y múltiples registros reales, transición por vencimiento y enlace al ID correcto. El contenido del detalle se implementó después, en la entrada siguiente.
+
+- [x] Detalle de Impulse (READ, UPDATE y DELETE): DetalleImpulso obtiene el registro real por ID con loading, error con Try again y not found; muestra nombre, precio, prioridad, motivo, recordatorio, cooldown con barra de progreso y estado, más acciones Edit details y Delete impulse. Nueva ruta `/impulsos/:id/editar` con EditarImpulso, formulario precargado, plazo de solo lectura y PUT; el borrado requiere confirmación en un panel y vuelve a My Impulses. El componente de opciones radio se extrajo a `OpcionesFormulario.jsx` para no duplicarlo entre creación y edición. Sin dependencias nuevas y sin cambios de API.
+
+- [x] Decisión cuando termina la espera (UPDATE): el detalle compara `fechaFinEspera` con la hora actual y, si aún no venció, conserva la vista de cooling; si venció, muestra `COOL-DOWN COMPLETE`, el titular con los días esperados y el panel `DO YOU STILL WANT IT?` con `YES, I STILL WANT IT` y `NO, LET IT GO`, bajo `YOU ORIGINALLY SAID`. Cada botón envía `actualizarImpulso(id, { estado })` y el documento devuelto actualiza la pantalla sin una segunda lectura; `decidiendo` evita dobles toques y un 409 recarga el registro. El backend acepta el cuerpo `{ "estado": "comprado" | "descartado" }` dentro de PUT, exige `pendiente`, bloquea la compra antes del plazo, asigna `fechaDecision` y no almacena nunca `listo`. Cambio de alcance registrado en `PLAN.md` antes de implementar; `.http`, colección de Postman, README y servicios/README sincronizados. Nuevos iconos `compra` y `ahorro` en `Icono.jsx`, sin dependencias nuevas. Verificado contra Atlas y navegador; CRUD automatizado y build correctos; la base se dejó vacía.
+
+- [x] Resumen económico del Home: bloque nuevo `SAVINGS_VAULT.SYS` / `ON HOLD` / `PURCHASED` con importes y contadores reales, sustituyendo las tarjetas provisionales con guiones. `Inicio` centraliza la única carga de `GET /api/impulsos` y la comparte con `ListaImpulsos` como propiedades, sin peticiones duplicadas; `—` durante la carga o el error y `Try again` común. Los grupos muestran `unlocked`, `paused` y `decided`, y la tarjeta `Pause an impulse` pasa al final de la página. Sección nueva en `PLAN.md` y documentación actualizada. Comprobado en navegador con cuatro registros reales, error con parada de la API y recuperación, sin desbordes a 320 px ni errores de consola; registros de prueba eliminados y los de la usuaria conservados. Sin dependencias nuevas ni cambios de API.
+
+- [x] Historial con impulsos resueltos: `/historial` reutiliza `GET /api/impulsos` y en cliente aplica `filter()` sobre `['comprado', 'descartado']` y `sort()` por `fechaDecision` descendente (`updatedAt` como respaldo), de modo que `filter()` entrega un array nuevo y ordenarlo no muta el estado. El componente nuevo `TarjetaVeredicto.jsx` muestra nombre, prioridad (en el hueco de categoría, igual que en el detalle), fecha y hora, precio e importe, y abre el detalle desde cualquier punto de la tarjeta: los descartados con `+` sobre fondo lima como dinero no gastado y `SKIPPED`, los comprados sin `+` sobre fondo blanco y `PURCHASED`. La sección `RECENT VERDICTS` muestra el contador de decisiones, sin recortar a `past 14 days` para no ocultar decisiones antiguas, y la tarjeta `PAUSE RECAP` evita las afirmaciones pseudocientíficas de la referencia. Estados de carga, error con `Try again` y vacío añadidos. Comprobado contra MongoDB: cinco registros creados (uno enfriando, uno listo, dos comprados y uno descartado) mostraron solo los tres resueltos en el orden correcto, y tras comprar el listo en el detalle pasó a ser el primero; después se comprobaron vacío, error con la API parada y recuperación, y se borraron los registros propios dejando el de la usuaria. Build correcto y sin desbordes a 320 px. Sin dependencias nuevas, sin cambios de API y sin tocar `.http` ni la colección de Postman.

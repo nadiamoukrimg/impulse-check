@@ -48,9 +48,9 @@ No se debe migrar a TypeScript. Todo el código de aplicación se escribirá en 
 - Añadir dependencias solo si su finalidad está documentada.
 - Registrar cualquier cambio de alcance en `PLAN.md` antes de implementarlo.
 
-## Estructura prevista
+## Estructura
 
-La estructura todavía no se ha creado. Cuando comience la implementación se utilizará:
+El backend y la estructura base del frontend ya existen:
 
 ```text
 frontend/src/componentes/
@@ -72,7 +72,7 @@ backend/middleware/
 
 ## Comandos previstos
 
-Estos comandos se activarán al crear los respectivos `package.json`; todavía no existen ni deben darse por verificados.
+Los comandos del backend y del frontend están creados y verificados. En PowerShell se puede utilizar `npm.cmd` en lugar de `npm`.
 
 ### Backend
 
@@ -94,6 +94,10 @@ npm run vista-previa
 ```
 
 Los scripts definitivos deben documentarse aquí y en el README después de comprobarlos. Un agente no debe ejecutar instalaciones ni añadir paquetes que no formen parte del plan aprobado.
+
+Los dos scripts del backend utilizan `node --use-system-ca` (directamente o mediante nodemon) para confiar en los certificados del sistema. Se han comprobado con conexión a Atlas y respuesta HTTP de salud. No desactivar la verificación TLS.
+
+Frontend: `desarrollo` inicia Vite en 127.0.0.1:5173; `construir` genera `dist/`; `vista-previa` sirve esa compilación en 127.0.0.1:4173. La navegación y recarga se han comprobado localmente. `frontend/vercel.json` prepara el fallback de rutas para un proyecto Vercel cuya raíz sea `frontend`; el despliegue no está verificado.
 
 ## Reglas para agentes de IA
 

@@ -33,6 +33,7 @@ Ejemplos: `TarjetaImpulso`, `impulsosPendientes`, `obtenerImpulsos`, `controlado
 - El diseño de Google Stitch/Netlify se utiliza como referencia visual, sin reutilizar su código.
 - La aplicación es mobile-first.
 - `Home` e `Impulses` se fusionan porque muestran las mismas listas activas.
+- Confirmado de nuevo al iniciar el frontend: navegación inferior con Home e History, y acceso destacado a Add Impulse. La primera fase solo prepara páginas y navegación, sin API; el enlace `/impulsos/ejemplo` muestra el detalle como previsualización explícita, sin registros simulados ni persistencia. La edición se incorporará con su formulario en una fase posterior.
 - Se omite `Settings` porque el almacenamiento local, la exportación y las preferencias quedan fuera del MVP.
 - No hay autenticación en esta versión.
 - Es una demo compartida: todas las visitas ven los mismos registros de MongoDB.
@@ -74,7 +75,7 @@ Muestra comprados y descartados ordenados por fecha de decisión, con acceso al 
 | --- | --- | --- |
 | Crear | `+ Add impulse` y formulario | `POST /api/impulsos` |
 | Leer | Inicio, detalle e historial | `GET /api/impulsos`, `GET /api/impulsos/:id` |
-| Actualizar | Edición, descarte y compra | `PUT /api/impulsos/:id`, `PATCH /api/impulsos/:id/decision` |
+| Actualizar | Edición, descarte y compra | `PUT /api/impulsos/:id` |
 | Eliminar | `Delete permanently` con confirmación | `DELETE /api/impulsos/:id` |
 
 Descartar nunca llama a `DELETE`: cambia el estado a `descartado`, asigna la fecha de decisión y conserva el registro.
@@ -88,6 +89,8 @@ Descartar nunca llama a `DELETE`: cambia el estado a `descartado`, asigna la fec
 | `nombre` | String | Obligatorio y sin espacios exteriores |
 | `precio` | Number | Obligatorio, igual o mayor que cero y expresado en EUR |
 | `motivo` | String | Obligatorio y sin espacios exteriores |
+| `prioridad` | String enum | Obligatoria al crear: `soloLoQuiero`, `seriaUtil` o `creoQueLoNecesito` |
+| `restriccionPersonal` | String | Recordatorio opcional, sin efecto en el plazo |
 | `fechaFinEspera` | Date | Obligatoria y calculada por el backend |
 | `estado` | String enum | `pendiente`, `comprado` o `descartado`; inicialmente `pendiente` |
 | `fechaDecision` | Date o null | Asignada por el backend al decidir |
@@ -95,6 +98,10 @@ Descartar nunca llama a `DELETE`: cambia el estado a `descartado`, asigna la fec
 | `updatedAt` | Date | Timestamp estándar de Mongoose |
 
 El formulario envía `duracionEspera`; el servidor la convierte en `fechaFinEspera`. El cliente no puede establecer ni editar esta fecha directamente.
+
+Contrato confirmado para el CRUD: `duracionEspera` es un número de días con valores permitidos `1`, `3`, `7` y `14`. POST exige `nombre`, `precio`, `motivo`, `duracionEspera` y `prioridad`, y admite `restriccionPersonal`; PUT exige los tres campos básicos completos y permite actualizar prioridad y recordatorio. Se rechazan campos adicionales. Las respuestas correctas contienen el documento o la lista directamente; DELETE devuelve un mensaje JSON. Los errores tienen la forma `{ "mensaje": "..." }`.
+
+Las decisiones viajan en el mismo PUT como `{ "estado": "comprado" }` o `{ "estado": "descartado" }`, sin ningún otro campo, según el cambio de alcance registrado al final de este documento.
 
 ## Estados derivados
 
@@ -107,7 +114,7 @@ Los estados visuales y totales se calculan a partir de `Impulso`. No existe otro
 
 ## Reglas de negocio
 
-- Solo se editan `nombre`, `precio` y `motivo`, y únicamente si el impulso está pendiente.
+- Solo se editan `nombre`, `precio`, `motivo`, `prioridad` y `restriccionPersonal`, y únicamente si el impulso está pendiente.
 - La fecha de espera no cambia después de crear el impulso.
 - Se puede descartar cualquier impulso pendiente.
 - Solo se puede comprar después de terminar la espera.
@@ -121,8 +128,7 @@ Los estados visuales y totales se calculan a partir de `Impulso`. No existe otro
 - `GET /api/impulsos`: devuelve todos los impulsos.
 - `GET /api/impulsos/:id`: devuelve uno o un error `404`.
 - `POST /api/impulsos`: valida, calcula `fechaFinEspera` y crea un pendiente.
-- `PUT /api/impulsos/:id`: edita nombre, precio y motivo en un pendiente.
-- `PATCH /api/impulsos/:id/decision`: aplica `comprado` o `descartado`.
+- `PUT /api/impulsos/:id`: edita nombre, precio y motivo en un pendiente; si el cuerpo solo contiene `estado`, aplica la decisión.
 - `DELETE /api/impulsos/:id`: elimina permanentemente un impulso.
 
 ## Arquitectura
@@ -136,9 +142,9 @@ Los estados visuales y totales se calculan a partir de `Impulso`. No existe otro
 
 No se necesitan procesos en segundo plano: se guarda una fecha límite y se compara con la hora actual al mostrar datos y procesar decisiones.
 
-## Estructura prevista del repositorio
+## Estructura del repositorio
 
-La estructura se creará durante la fase de preparación. En este momento todavía no existe código de aplicación.
+El backend CRUD y la base del frontend React ya están creados. La integración con la API y las acciones de decisión siguen pendientes.
 
 ```text
 PEC5/
@@ -150,18 +156,21 @@ PEC5/
 │   │   └── estilos/
 │   └── package.json
 ├── backend/
+│   ├── aplicacion.js
+│   ├── servidor.js
+│   ├── .env.example
 │   ├── configuracion/
 │   ├── controladores/
 │   ├── modelos/
 │   ├── rutas/
 │   ├── middleware/
-│   └── package.json
+│   ├── package.json
+│   └── package-lock.json
 ├── PLAN.md
 ├── AGENTS.md
 ├── SKILLS.md
 ├── TASKS.md
 ├── README.md
-└── .env.example
 ```
 
 El frontend consumirá la API mediante un módulo de servicio. El backend separará la conexión, el modelo, los controladores, las rutas y la gestión de errores sin introducir más capas de las necesarias para una única entidad.
@@ -221,4 +230,52 @@ No se necesitan Axios, Redux, autenticación, librerías de fechas o gráficos n
 
 ## Fuera del alcance
 
-Autenticación, categorías, prioridad, enlaces, imágenes, edición del plazo, reapertura de decisiones, notificaciones, exportación, filtros avanzados, gráficos, varias monedas y varios idiomas.
+Autenticación, categorías, enlaces, imágenes, edición del plazo, reapertura de decisiones, notificaciones, exportación, filtros avanzados, gráficos, varias monedas y varios idiomas.
+
+## Cambio de alcance confirmado — prioridad y recordatorio personal
+
+La alumna solicita incorporar `prioridad` con valores `soloLoQuiero`, `seriaUtil` y `creoQueLoNecesito`, mostrados como Just Want It, Would Be Useful e I Think I Need It. Es obligatoria en las nuevas creaciones. `restriccionPersonal` es un texto opcional, sin espacios exteriores, utilizado solo como recordatorio: no verifica condiciones, no requiere confirmación y no adelanta el plazo de compra.
+
+POST acepta estos dos campos además de los cuatro existentes. PUT permite editarlos mientras el impulso está pendiente; si se omiten conserva los valores anteriores, manteniendo compatibles las peticiones existentes. Los documentos antiguos no se migran ni reciben una prioridad inventada. Los campos básicos siguen siendo obligatorios. El servidor sigue calculando `fechaFinEspera`.
+
+Add Impulse se organiza en 01 Target Object (nombre y precio), 02 Reality Check (motivo y prioridad) y 03 Cooling Protocol (duración y recordatorio). La duración inicial es 7 días y la prioridad inicial Would Be Useful, como en la referencia. La conexión mínima del listado de Home permite comprobar que el impulso creado aparece tras guardar; Home e Impulses siguen unificados. No se añaden categorías ni enlaces.
+
+## Listado real de impulsos
+
+Home mantiene unificado My Impulses. El listado carga todos los documentos mediante GET /api/impulsos y los agrupa en Ready to decide, Cooling down y Recent decisions (comprados y descartados). Las tarjetas reutilizables enlazan a /impulsos/:id. Ready se deriva de fechaFinEspera y no se guarda como estado; el reloj se actualiza localmente sin nuevas peticiones. No se implementan aquí detalle ni decisiones; los resúmenes económicos se describen en la sección siguiente.
+
+## Resumen económico del Home
+
+Petición de la alumna con la captura de la referencia: en Home deben verse el dinero en pausa, además del recuento de añadir impulso y de lo gastado o ahorrado. Se sustituyen las dos tarjetas provisionales con guiones por el bloque real de la referencia:
+
+- **`SAVINGS_VAULT.SYS`** (tarjeta principal): `TOTAL NET SAVED / NOT SPENT`, suma de los precios de los descartados, con el número de impulsos descartados debajo.
+- **`ON HOLD`**: suma de los precios de los pendientes y número de pausas activas.
+- **`PURCHASED`**: suma de los precios de los comprados y número de compras intencionadas.
+
+`Inicio` es el único que consulta `GET /api/impulsos` y pasa los datos a `ListaImpulsos` como propiedades, para no repetir la petición; el resumen y el listado se actualizan juntos y `Try again` reutiliza ese mismo reintento. Mientras carga o si falla la API, los importes muestran `—`. Los grupos de la lista muestran su contador como `unlocked`, `paused` y `decided`, como en la referencia. La tarjeta de añadir impulso se mueve debajo de los grupos, porque la referencia no la muestra antes del resumen; el botón de la cabecera sigue disponible. Se conservan los textos del héroe actuales por decisión de la alumna. No se añaden dependencias ni endpoints nuevos.
+
+## Cambio de alcance confirmado — decisión de compra o descarte mediante PUT
+
+La alumna pide resolver la decisión con **PUT mediante `services/api.js`**, en lugar del endpoint PATCH previsto inicialmente. Se descarta `PATCH /api/impulsos/:id/decision` y PUT pasa a aceptar dos modos de cuerpo:
+
+- **Edición**: `nombre`, `precio` y `motivo` completos, con `prioridad` y `restriccionPersonal` opcionales. Solo con `estado: pendiente`. Es el contrato existente, sin cambios.
+- **Decisión**: un único campo `estado`, con valor `comprado` o `descartado`. No se admite combinarlo con campos de edición, ni enviar `pendiente` (no se reabre una decisión), ni `fechaDecision`, que asigna siempre el servidor.
+
+Reglas aplicadas por el backend, también en este modo:
+
+- `comprado` exige `fechaFinEspera` igual o anterior a la hora actual; antes devuelve `409`.
+- `descartado` se acepta en cualquier momento, porque el descarte anticipado sigue permitido.
+- El filtro de actualización exige `estado: pendiente`, de modo que un impulso resuelto no recibe una segunda decisión (`409`).
+- `listo` / `ready` **nunca** se almacena: se deriva comparando `fechaFinEspera` con la hora actual, igual que en la interfaz.
+
+La interfaz solo ofrece las dos decisiones cuando el plazo ya terminó; el descarte anticipado como botón propio queda pendiente de su tarea.
+
+## Historial con impulsos resueltos
+
+Pantalla `/historial` sobre la referencia visual de Stitch, con datos reales y sin endpoints nuevos: hace la misma lectura `GET /api/impulsos` que el resto de páginas y transforma la respuesta en cliente.
+
+- **Filtrado**: `filter()` conserva solo `estado: comprado` y `estado: descartado`. Los pendientes (enfriando o listos) nunca aparecen, aunque sigan en la base de datos.
+- **Ordenación**: `sort()` sobre `fechaDecision` descendente, con `updatedAt` como respaldo. `filter()` devuelve un array nuevo, así que ordenar no muta el estado de React.
+- **Presentación**: cada resuelto se pinta con `TarjetaVeredicto.jsx`, que reutiliza `Icono` y `Link` al detalle: nombre, categoría (prioridad, mismo criterio que en el detalle), fecha y hora de decisión, precio e importe. Los descartados se muestran como dinero no gastado con el prefijo `+`; los comprados, sin prefijo. El icono sobre fondo lima y el importe sobre fondo lima diferencian `SKIPPED` de `PURCHASED`, además de su etiqueta.
+- **Contador**: `RECENT VERDICTS` muestra cuántas decisiones hay, sin recortar a un rango de días, para no ocultar decisiones antiguas.
+- **Estados**: cargando, error con `Try again`, vacío (`No decisions yet`) y lista. Sin dependencias nuevas ni cambios de API.

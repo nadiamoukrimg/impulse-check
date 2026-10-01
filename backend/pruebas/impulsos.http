@@ -1,0 +1,114 @@
+# Peticiones independientes: seleccionar y enviar solo la deseada. Configurar base y copiar manualmente el _id creado en id. GET por ID, PUT y DELETE requieren un registro existente; la última consulta requiere que se haya eliminado. Los bloques de decisión resuelven el registro de forma permanente, así que se envían después de las comprobaciones de edición. Comprar tras terminar la espera (esperado 200) necesita un registro con fechaFinEspera ya vencida. Para repetir la demostración, crear otro registro y actualizar id. No contiene credenciales. No ejecutar DELETE sobre datos ajenos.
+# Arrancar desde backend: npm.cmd run desarrollo
+# En un cliente compatible con .http, enviar cada bloque por separado.
+@base = http://localhost:3000
+@id = sustituir_por_el_id_creado
+
+### Listar impulsos — esperado 200
+# Devuelve una lista JSON, que puede estar vacía.
+GET {{base}}/api/impulsos
+
+### Crear impulso ficticio — esperado 201
+# Crea un documento real. Copiar el _id de la respuesta en la variable id. Anotar fechaFinEspera para comprobar que PUT no la cambia.
+POST {{base}}/api/impulsos
+Content-Type: application/json
+
+{
+  "nombre": "Auriculares de prueba",
+  "precio": 79.9,
+  "motivo": "He visto una oferta y quiero esperar antes de decidir",
+  "duracionEspera": 3,
+  "prioridad": "seriaUtil",
+  "restriccionPersonal": "Only buy if I still need it next week"
+}
+
+### Consultar por ID — esperado 200
+# Usar el ID creado o el de otro registro de prueba existente. Comprueba la persistencia del documento.
+GET {{base}}/api/impulsos/{{id}}
+
+### Editar impulso pendiente — esperado 200
+# Necesita un registro pendiente. Devuelve los datos modificados y conserva fechaFinEspera. No enviar duracionEspera ni fechas. Un cuerpo con un único campo estado no es una edición: es una decisión (ver los bloques de decisión).
+PUT {{base}}/api/impulsos/{{id}}
+Content-Type: application/json
+
+{
+  "nombre": "Auriculares de prueba revisados",
+  "precio": 69.9,
+  "motivo": "He comparado precios durante la espera"
+}
+
+### Comprobar edición persistida — esperado 200
+# Después de PUT, comprobar precio 69.9, nombre y motivo modificados, y fechaFinEspera original.
+GET {{base}}/api/impulsos/{{id}}
+
+### Comprar antes de terminar la espera — esperado 409
+# El cuerpo solo puede contener estado. Si fechaFinEspera todavía no pasó, la compra se rechaza con mensaje JSON y el registro sigue pendiente.
+PUT {{base}}/api/impulsos/{{id}}
+Content-Type: application/json
+
+{
+  "estado": "comprado"
+}
+
+### Descartar antes de terminar la espera — esperado 200
+# El descarte anticipado sí está permitido. Devuelve el documento con estado descartado y fechaDecision asignada por el servidor. Resuelve el registro: los bloques de edición y decisión posteriores devolverán 409 o 400.
+PUT {{base}}/api/impulsos/{{id}}
+Content-Type: application/json
+
+{
+  "estado": "descartado"
+}
+
+### Tomar una segunda decisión — esperado 409
+# Ejecutar después de una decisión. Un impulso resuelto no recibe otra: el filtro exige estado pendiente.
+PUT {{base}}/api/impulsos/{{id}}
+Content-Type: application/json
+
+{
+  "estado": "comprado"
+}
+
+### Mezclar decisión y edición — esperado 400
+# El cuerpo de decisión no admite ningún otro campo.
+PUT {{base}}/api/impulsos/{{id}}
+Content-Type: application/json
+
+{
+  "estado": "comprado",
+  "nombre": "Auriculares de prueba revisados"
+}
+
+### Rechazar un estado no resoluble — esperado 400
+# Solo se admiten comprado y descartado. 'listo' y 'pendiente' se rechazan: ready nunca se guarda y una decisión no se reabre.
+PUT {{base}}/api/impulsos/{{id}}
+Content-Type: application/json
+
+{
+  "estado": "listo"
+}
+
+### Rechazar precio negativo — esperado 400
+# Devuelve un objeto con mensaje de error; no debe crear un documento.
+POST {{base}}/api/impulsos
+Content-Type: application/json
+
+{
+  "nombre": "Auriculares de prueba",
+  "precio": -1,
+  "motivo": "He visto una oferta y quiero esperar antes de decidir",
+  "duracionEspera": 3,
+  "prioridad": "seriaUtil",
+  "restriccionPersonal": "Only buy if I still need it next week"
+}
+
+### Rechazar ID mal formado — esperado 400
+# Devuelve un mensaje JSON de identificador inválido.
+GET {{base}}/api/impulsos/incorrecto
+
+### Eliminar registro de prueba — esperado 200
+# Confirmar que id corresponde al registro ficticio que se quiere borrar. La eliminación es permanente. Devuelve un mensaje JSON.
+DELETE {{base}}/api/impulsos/{{id}}
+
+### Comprobar eliminación e ID inexistente — esperado 404
+# Ejecutar después de DELETE con el mismo id. Debe devolver mensaje de impulso no encontrado.
+GET {{base}}/api/impulsos/{{id}}

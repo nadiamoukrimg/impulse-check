@@ -1,0 +1,273 @@
+{
+  "info": {
+    "name": "Impulsos - CRUD manual",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Peticiones independientes: seleccionar y enviar solo la deseada. Configurar base y copiar manualmente el _id creado en id. GET por ID, PUT y DELETE requieren un registro existente; la última consulta requiere que se haya eliminado. Los bloques de decisión resuelven el registro de forma permanente, así que se envían después de las comprobaciones de edición. Comprar tras terminar la espera (esperado 200) necesita un registro con fechaFinEspera ya vencida. Para repetir la demostración, crear otro registro y actualizar id. No contiene credenciales. No ejecutar DELETE sobre datos ajenos."
+  },
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "id",
+      "value": "sustituir_por_el_id_creado",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Listar impulsos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/api/impulsos",
+        "description": "Esperado: HTTP 200. Devuelve una lista JSON, que puede estar vacía."
+      },
+      "response": []
+    },
+    {
+      "name": "Crear impulso ficticio",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/api/impulsos",
+        "description": "Esperado: HTTP 201. Crea un documento real. Copiar el _id de la respuesta en la variable id. Anotar fechaFinEspera para comprobar que PUT no la cambia.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Auriculares de prueba\",\n  \"precio\": 79.9,\n  \"motivo\": \"He visto una oferta y quiero esperar antes de decidir\",\n  \"duracionEspera\": 3,\n  \"prioridad\": \"seriaUtil\",\n  \"restriccionPersonal\": \"Only buy if I still need it next week\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Consultar por ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/api/impulsos/{{id}}",
+        "description": "Esperado: HTTP 200. Usar el ID creado o el de otro registro de prueba existente. Comprueba la persistencia del documento."
+      },
+      "response": []
+    },
+    {
+      "name": "Editar impulso pendiente",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/api/impulsos/{{id}}",
+        "description": "Esperado: HTTP 200. Necesita un registro pendiente. Devuelve los datos modificados y conserva fechaFinEspera. No enviar duracionEspera ni fechas. Un cuerpo con un único campo estado no es una edición: es una decisión (ver los bloques de decisión).",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Auriculares de prueba revisados\",\n  \"precio\": 69.9,\n  \"motivo\": \"He comparado precios durante la espera\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Comprobar edición persistida",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/api/impulsos/{{id}}",
+        "description": "Esperado: HTTP 200. Después de PUT, comprobar precio 69.9, nombre y motivo modificados, y fechaFinEspera original."
+      },
+      "response": []
+    },
+    {
+      "name": "Comprar antes de terminar la espera",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/api/impulsos/{{id}}",
+        "description": "Esperado: HTTP 409. El cuerpo solo puede contener estado. Si fechaFinEspera todavía no pasó, la compra se rechaza con mensaje JSON y el registro sigue pendiente.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"comprado\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Descartar antes de terminar la espera",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/api/impulsos/{{id}}",
+        "description": "Esperado: HTTP 200. El descarte anticipado sí está permitido. Devuelve el documento con estado descartado y fechaDecision asignada por el servidor. Resuelve el registro: los bloques de edición y decisión posteriores devolverán 409 o 400.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"descartado\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Tomar una segunda decisión",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/api/impulsos/{{id}}",
+        "description": "Esperado: HTTP 409. Ejecutar después de una decisión. Un impulso resuelto no recibe otra: el filtro exige estado pendiente.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"comprado\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Mezclar decisión y edición",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/api/impulsos/{{id}}",
+        "description": "Esperado: HTTP 400. El cuerpo de decisión no admite ningún otro campo.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"comprado\",\n  \"nombre\": \"Auriculares de prueba revisados\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Rechazar un estado no resoluble",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/api/impulsos/{{id}}",
+        "description": "Esperado: HTTP 400. Solo se admiten comprado y descartado. 'listo' y 'pendiente' se rechazan: ready nunca se guarda y una decisión no se reabre.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"listo\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Rechazar precio negativo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/api/impulsos",
+        "description": "Esperado: HTTP 400. Devuelve un objeto con mensaje de error; no debe crear un documento.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Auriculares de prueba\",\n  \"precio\": -1,\n  \"motivo\": \"He visto una oferta y quiero esperar antes de decidir\",\n  \"duracionEspera\": 3,\n  \"prioridad\": \"seriaUtil\",\n  \"restriccionPersonal\": \"Only buy if I still need it next week\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Rechazar ID mal formado",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/api/impulsos/incorrecto",
+        "description": "Esperado: HTTP 400. Devuelve un mensaje JSON de identificador inválido."
+      },
+      "response": []
+    },
+    {
+      "name": "Eliminar registro de prueba",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base}}/api/impulsos/{{id}}",
+        "description": "Esperado: HTTP 200. Confirmar que id corresponde al registro ficticio que se quiere borrar. La eliminación es permanente. Devuelve un mensaje JSON."
+      },
+      "response": []
+    },
+    {
+      "name": "Comprobar eliminación e ID inexistente",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/api/impulsos/{{id}}",
+        "description": "Esperado: HTTP 404. Ejecutar después de DELETE con el mismo id. Debe devolver mensaje de impulso no encontrado."
+      },
+      "response": []
+    }
+  ]
+}
