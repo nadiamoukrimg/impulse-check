@@ -145,7 +145,7 @@ No se necesitan procesos en segundo plano: se guarda una fecha límite y se comp
 
 ## Estructura del repositorio
 
-El backend CRUD y la aplicación React están integrados con la API: creación, listado, detalle, edición, decisión, eliminación e historial funcionan contra MongoDB Atlas. Siguen pendientes el formulario compartido y el despliegue.
+El backend CRUD y la aplicación React están integrados con la API: creación, listado, detalle, edición, decisión, eliminación e historial funcionan contra MongoDB Atlas. La preparación de Vercel también está lista: la API se publica con los adaptadores de `backend/api/` sobre `aplicacion.js` (Vercel no ejecuta `servidor.js`) y el CORS se controla con la variable `ORIGEN_PERMITIDO`, sin dependencias ni cambios locales; el frontend recibe la URL de la API con `VITE_API_URL`. Siguen pendientes ejecutar y verificar el despliegue real y el formulario compartido.
 
 ```text
 PEC5/

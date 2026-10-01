@@ -31,7 +31,7 @@ Comprobado en la primera fase: los tres scripts, navegación y recarga de creaci
 
 Vite terminó la compilación con dos avisos de React Router sobre la directiva `use client`; no bloquearon la compilación ni el recorrido del navegador. No se ocultan los avisos.
 
-Para el futuro despliegue del frontend en Vercel, seleccionar `frontend` como directorio raíz. `vercel.json` prepara la resolución de rutas a `index.html`. Esta configuración todavía no se ha probado en un despliegue público.
+Para el futuro despliegue del frontend en Vercel, seleccionar `frontend` como directorio raíz. `vercel.json` prepara la resolución de rutas a `index.html` y excluye `/api/`, de modo que una llamada a la API mal configurada falle con el 404 de Vercel en lugar de devolver la página. Esta configuración todavía no se ha probado en un despliegue público; los detalles están en [Despliegue en Vercel](#despliegue-en-vercel).
 
 ## Arranque local
 
@@ -153,3 +153,46 @@ La tarjeta `TarjetaVeredicto.jsx` muestra nombre, la prioridad en el hueco de ca
 También se implementaron los estados: `Loading your history…`, error con `Try again`, vacío con `No decisions yet` y lista con las tarjetas.
 
 Comprobado el 1 de octubre de 2026 contra Atlas y desde el navegador: con cinco registros de prueba (uno enfriando, uno listo, dos comprados y un descartado con fechas escalonadas), solo aparecieron los tres resueltos, en el mismo orden que devolvía `GET /api/impulsos` ordenado por `fechaDecision` descendente, y los pendientes no se pintaron. Al comprar el registro listo desde el detalle, la pantalla pasó de 3 a 4 decisiones con el nuevo el primero. Cada tarjeta abrió su detalle. También se verificaron el estado vacío con la usuaria presente, el error al detener la API y la recuperación al arrancarla de nuevo. Sin desbordes a 320 px, sin errores de consola y con `npm.cmd run construir` correcto. Los cinco registros de prueba se borraron al terminar y el documento existente se conservó; `.http` y la colección de Postman no cambian, porque la API no se modifica.
+
+## Despliegue en Vercel
+
+El despliegue previsto usa **dos proyectos de Vercel apuntando al mismo repositorio**, cada uno con su Root Directory:
+
+| Proyecto | Root Directory | Framework | Qué sirve |
+| --- | --- | --- | --- |
+| `impulse-check` | `frontend` | Vite (detectado automáticamente) | SPA compilada con `npm run build` hacia `dist/` |
+| `impulse-check-api` | `backend` | Other (sin build) | Funciones serverless de la carpeta `api/` |
+
+### Cómo se publica la API sin cambiar la arquitectura
+
+Vercel no ejecuta `servidor.js`: en un entorno serverless no hay proceso que haga `listen`. La app Express se publica mediante tres adaptadores de la carpeta `api/`, uno por ruta real, `api/health.js`, `api/impulsos.js` y `api/impulsos/[id].js`. Los tres exportan la función de `configuracion/entradaVercel.js`, que espera a una única conexión con Atlas por instancia caliente y delega en la misma `aplicacion.js` que se usa en local. Modelo, rutas, controlador y middleware no cambian.
+
+No se usa `rewrites` para enrutar la API: Vercel sustituye `req.url` en una rewrite y Express necesita la URL original para hacer coincidir `/api/impulsos/:id`. En el proyecto del frontend, en cambio, `vercel.json` excluye `/api/` del fallback a `index.html`, para que una llamada relativa a la API mal configurada falle con el 404 de Vercel en vez de recibir la página.
+
+En local nada cambia: `npm.cmd run iniciar` y `npm.cmd run desarrollo` siguen arrancando `servidor.js`, y el proxy de Vite sigue evitando el cruce de orígenes.
+
+### CORS
+
+`middleware/corsPermitido.js` añade `Access-Control-Allow-Origin`, los métodos y cabeceras permitidas, y responde `204` a los preflight `OPTIONS`, pero **solo** cuando la variable `ORIGEN_PERMITIDO` contiene el origen del frontend (lista separada por comas). Sin esa variable la middleware no modifica ninguna respuesta, que es el caso local. No se añadió la dependencia `cors`: con un único origen fijo configurado por variable no hace falta.
+
+### Variables que se configuran a mano en Vercel
+
+Nunca se versionan: solo viven en el panel de Vercel y, en local, en el `.env` ignorado por Git.
+
+| Proyecto | Variable | Ejemplo | Notas |
+| --- | --- | --- | --- |
+| `impulse-check-api` | `MONGODB_URI` | URI de Atlas con la base `Impulse_Check` | Environments Production y Preview |
+| `impulse-check-api` | `ORIGEN_PERMITIDO` | `https://impulse-check.vercel.app` | Se conoce tras crear el proyecto del frontend |
+| `impulse-check` | `VITE_API_URL` | `https://impulse-check-api.vercel.app/api` | Se lee **al compilar**: si cambia, hay que volver a desplegar |
+
+Paso previo en Atlas: *Network Access* debe permitir las direcciones de Vercel (o `0.0.0.0/0` para la demo). `.env.example` documenta las dos claves del backend y ningún `.env` está en el repositorio.
+
+### Comprobación del despliegue
+
+1. `GET https://<api>/api/health` devuelve `200` con `{"estado":"ok",…}`.
+2. `GET https://<api>/api/impulsos` devuelve `200` con la lista JSON.
+3. La web abre Home con los importes reales y la consola no muestra errores CORS.
+4. Crear, editar y eliminar un impulso desde la interfaz y comprobar en Atlas que el documento cambia.
+5. `git ls-files` solo muestra `.env.example`, nunca `.env`.
+
+Estado: la configuración está preparada y comprobada en local (prueba de integración del CRUD, prueba de las cabeceras CORS con y sin `ORIGEN_PERMITIDO`, build de producción y peticiones a través de la entrada de Vercel). **El despliegue real todavía no se ha realizado ni verificado**; los pasos anteriores quedan pendientes de ejecutarlos al publicar.

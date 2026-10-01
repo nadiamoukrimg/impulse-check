@@ -205,3 +205,19 @@ La alumna solicitó My Impulses con datos reales y cuatro estados. Se conservaro
 - Sin dependencias nuevas y sin cambios en el modelo ni en las rutas de la API: se sigue usando `GET /api/impulsos`.
 - Registros: los cinco documentos creados para esta comprobación se eliminaron al terminar; el documento de la usuaria se conservó.
 - Revisión manual de la alumna: pendiente.
+
+### Corrección de los críticos y repetición de la auditoría
+
+- Herramienta: OpenCode con navegador integrado.
+- Prompt: "arregla los criticos de la auditoria y vuelve a pasarla".
+- Técnica útil: verificar cada crítico con hechos antes de darlo por resuelto (`git remote -v`, `git log`, `git ls-files` sobre los `.env`) en lugar de darlo por bueno por la ronda anterior.
+- Técnica útil: concentrar toda la auditoría de la API en un único script que crea sus registros temporales, comprueba los códigos esperados, los borra y compara la colección con la línea de base, de modo que cualquier fallo quede listado y la base quede como al empezar.
+- Técnica útil: probar los estados vacío y de error con una instancia aislada (segundo Vite en el puerto 5199 con `API_DESTINO` apuntando a una API simulada de unas cuantas líneas) en vez de detener la API de la usuaria; así se comprueban vacío, error con `Try again` y recuperación sin tocar nada.
+- Técnica útil: para Vercel, leer la documentación antes de proponer cambios: las `rewrites` sustituyen `req.url`, así que la API se publica con archivos de la carpeta `api/` que coinciden con las rutas reales y no con rewrites.
+- Parte generada con IA: `frontend/vercel.json` excluye `/api/` del fallback SPA; la configuración de Vercel del backend (archivos `api/`, `entradaVercel.js`, `corsPermitido.js`) y la documentación ya existían de la tarea anterior.
+- Resultado comprobado: 24 comprobaciones HTTP correctas y 0 fallos (salud, 201 con `Location`, cinco validaciones de creación con 400, 400 de id mal formado, 404 en GET/PUT/DELETE desconocidos, 409 de compra anticipada, 200 de descarte anticipado con `fechaDecision` del servidor, 409 de segunda decisión y de edición sobre resuelto, 200 de edición con `fechaFinEspera` intacta, 400 de estado inválido y de mezcla, 413 con 150 KB, 404 en JSON para rutas desconocidas y colección restaurada al inicio). Prueba de integración `pass 1/1`, fallback 500 en JSON, CORS emitido con `ORIGEN_PERMITIDO` y ausente sin él, entrada de Vercel respondiendo 200/200/400 con la URL original, build con exit 0 y JSON de `vercel.json` y de Postman válidos. En navegador: creación con 201, edición con PUT 200 y plazo intacto, descarte, historial con `1 decision`, borrado con diálogo de confirmación y 200, pantallas de 404, estado vacío en Home e Historial, error con `Try again` y recuperación, y consola sin errores de la aplicación.
+- Incidencias reales: el primer guion de auditoría usó `id` en lugar de `_id` y produjo 9 falsos fallos y dos registros temporales huérfanos, que se borraron antes de repetir la prueba corregida; un clic automatizado sobre `PAUSE IT NOW` no envió nada y hizo falta `form.requestSubmit()` para ejercitar el mismo controlador (artefacto del automatizador, no de la aplicación); la ventana del navegador mide 298 px, por lo que el desborde observado provenía del `min-width: 320px` del cuerpo y no de las tarjetas.
+- Hallazgo nuevo: la interfaz todavía no ofrece el descarte anticipado como botón propio (pendiente ya documentado en `PLAN.md`), clasificado como importante y no crítico.
+- Sin dependencias nuevas ni cambios de modelo ni de API.
+- Registros: los documentos temporales creados por el guion y por el recorrido del navegador se borraron; solo queda el documento existente de la alumna.
+- Revisión manual de la alumna: pendiente.
